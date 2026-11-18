@@ -147,7 +147,7 @@ async function changePassword(req, res) {
 
         const valid = await bcrypt.compare(currentPassword, rows[0].password_hash);
         if (!valid) {
-            return res.status(401).json({ error: 'Password attuale errata' });
+            return res.status(400).json({ error: 'Password attuale errata' });
         }
 
         const newHash = await bcrypt.hash(newPassword, 10);
