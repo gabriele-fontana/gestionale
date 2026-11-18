@@ -79,6 +79,9 @@ async function login(req, res) {
         if (!valid) {
             return res.status(401).json({ error: 'Credenziali non valide' });
         }
+        if (!user.is_active) {
+            return res.status(403).json({ error: 'Account disattivato' });
+        }
 
         res.json({
             token: createToken(user),

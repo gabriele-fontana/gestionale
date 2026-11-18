@@ -54,17 +54,20 @@ async function createUser(req, res) {
 
 async function updateUser(req, res) {
     const targetId = Number(req.params.id);
-    const { name, role } = req.body;
+    const { name, role, isActive } = req.body || {};
+    const hasActive = typeof isActive === 'boolean';
 
-    if (!name && !role) {
+    if (!name && !role && !hasActive) {
         return res.status(400).json({ error: 'Niente da aggiornare' });
     }
     if (role && !['admin', 'user'].includes(role)) {
         return res.status(400).json({ error: 'Ruolo non valido' });
     }
+    if (hasActive && !isActive && targetId === req.user.id) {
+        return res.status(400).json({ error: 'Non puoi disattivare te stesso' });
+    }
 
     try {
-        // L'utente deve esistere ED essere nello stesso appartamento
         const [rows] = await pool.query(
             'SELECT id, role FROM users WHERE id = ? AND apartment_id = ?',
             [targetId, req.user.apartmentId]
@@ -73,21 +76,27 @@ async function updateUser(req, res) {
             return res.status(404).json({ error: 'Utente non trovato' });
         }
 
-        // Non si può togliere il ruolo all'ultimo admin
-        if (role === 'user' && rows[0].role === 'admin') {
+        // L'appartamento deve sempre avere almeno un admin attivo
+        const losesAdmin =
+            rows[0].role === 'admin' && (role === 'user' || (hasActive && !isActive));
+        if (losesAdmin) {
             const [admins] = await pool.query(
                 `SELECT COUNT(*) AS total FROM users
-         WHERE apartment_id = ? AND role = 'admin' AND id <> ?`,
+         WHERE apartment_id = ? AND role = 'admin' AND is_active = TRUE AND id <> ?`,
                 [req.user.apartmentId, targetId]
             );
             if (admins[0].total === 0) {
-                return res.status(400).json({ error: 'Deve esserci almeno un amministratore' });
+                return res.status(400).json({ error: 'Deve esserci almeno un amministratore attivo' });
             }
         }
 
         await pool.query(
-            'UPDATE users SET name = COALESCE(?, name), role = COALESCE(?, role) WHERE id = ?',
-            [name || null, role || null, targetId]
+            `UPDATE users
+       SET name = COALESCE(?, name),
+           role = COALESCE(?, role),
+           is_active = COALESCE(?, is_active)
+       WHERE id = ?`,
+            [name || null, role || null, hasActive ? isActive : null, targetId]
         );
 
         res.json({ message: 'Utente aggiornato' });
@@ -118,7 +127,7 @@ async function deleteUser(req, res) {
         // L'utente ha spese collegate: il DB blocca la cancellazione
         if (err.code === 'ER_ROW_IS_REFERENCED_2') {
             return res.status(409).json({
-                error: 'Impossibile eliminare: l\'utente ha spese registrate',
+                error: "L'utente ha spese registrate: disattivalo invece di eliminarlo",
             });
         }
         console.error(err);
@@ -138,12 +147,11 @@ async function changePassword(req, res) {
 
     try {
         const [rows] = await pool.query(
-            'SELECT password_hash FROM users WHERE id = ?',
-            [req.user.id]
+            `SELECT id, name, email, role, is_active, created_at
+            FROM users WHERE apartment_id = ?
+            ORDER BY is_active DESC, name`,
+            [req.user.apartmentId]
         );
-        if (!rows[0]) {
-            return res.status(404).json({ error: 'Utente non trovato' });
-        }
 
         const valid = await bcrypt.compare(currentPassword, rows[0].password_hash);
         if (!valid) {
