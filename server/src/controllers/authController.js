@@ -13,6 +13,10 @@ function createToken(user) {
 async function register(req, res) {
     const { name, email, password, apartmentName } = req.body;
 
+    if (process.env.ALLOW_REGISTRATION === 'false') {
+        return res.status(403).json({ error: 'Le registrazioni sono chiuse' });
+    }
+
     if (!name || !email || !password || !apartmentName) {
         return res.status(400).json({ error: 'Compila tutti i campi' });
     }
