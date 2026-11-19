@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes');
 const app = express();
 const expenseRoutes = require('./routes/expenseRoutes');
 const shoppingRoutes = require('./routes/shoppingRoutes');
+const noteRoutes = require('./routes/noteRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -24,6 +25,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/shopping', shoppingRoutes);
+app.use('/api/notes', noteRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server in ascolto sulla porta ${PORT}`);

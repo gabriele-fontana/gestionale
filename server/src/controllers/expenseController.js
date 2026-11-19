@@ -60,6 +60,7 @@ function computeTransfers(users, net) {
 
 async function listExpenses(req, res) {
     try {
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 100, 1), 100);
         const [expenses] = await pool.query(
             `SELECT e.id, e.description, e.amount, e.category, e.expense_date,
               e.paid_by, u.name AS paid_by_name
@@ -67,8 +68,8 @@ async function listExpenses(req, res) {
        JOIN users u ON u.id = e.paid_by
        WHERE e.apartment_id = ?
        ORDER BY e.expense_date DESC, e.id DESC
-       LIMIT 100`,
-            [req.user.apartmentId]
+       LIMIT ?`,
+            [req.user.apartmentId, limit]
         );
 
         if (expenses.length === 0) return res.json([]);
