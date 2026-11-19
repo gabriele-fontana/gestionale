@@ -16,6 +16,10 @@ export default function Layout() {
                     <span className="icon">💶</span>
                     Spese
                 </NavLink>
+                <NavLink to="/shopping">
+                    <span className="icon">🛒</span>
+                    Lista
+                </NavLink>
                 <NavLink to="/users">
                     <span className="icon">👥</span>
                     Coinquilini

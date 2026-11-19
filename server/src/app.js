@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const app = express();
 const expenseRoutes = require('./routes/expenseRoutes');
+const shoppingRoutes = require('./routes/shoppingRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -22,6 +23,7 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/shopping', shoppingRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server in ascolto sulla porta ${PORT}`);

@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Profile from './pages/Profile';
 import Expenses from './pages/Expenses';
+import ShoppingList from './pages/Shopping';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/expenses" element={<Expenses />} />
+          <Route path="/shopping" element={<ShoppingList />} />
           <Route path="/users" element={<Users />} />
           <Route path="/profile" element={<Profile />} />
         </Route>

@@ -315,3 +315,80 @@ h2 {
 .actions button {
   min-width: 6rem;
 }
+/* Lista della spesa */
+.add-item {
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.add-item input {
+  flex: 1;
+  min-width: 0;
+}
+
+.add-item button {
+  padding: 0.75rem 1rem;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem 0.35rem 1rem;
+  border-bottom: 1px solid #f0f0f3;
+}
+
+.item-row:last-child {
+  border-bottom: 0;
+}
+
+.item-label {
+  flex: 1;
+  padding: 0.6rem 0;
+  /* area di tocco comoda sul telefono */
+}
+
+.item-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: #6e6e73;
+}
+
+.bought .item-text {
+  color: #8e8e93;
+  text-decoration: line-through;
+}
+
+.icon-btn {
+  padding: 0.6rem 0.8rem;
+  font-size: 1.1rem;
+  color: #8e8e93;
+  background: transparent;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+button.small {
+  padding: 0.45rem 0.8rem;
+  font-size: 0.85rem;
+}
