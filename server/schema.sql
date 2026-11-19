@@ -23,7 +23,7 @@ CREATE TABLE expenses (
   amount DECIMAL(10,2) NOT NULL,
   paid_by INT NOT NULL,
   category VARCHAR(50),
-  expense_date DATE NOT NULL DEFAULT (CURRENT_DATE),
+  expense_date DATE NOT NULL DEFAULT (CURRENT_DATE()),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE,
   FOREIGN KEY (paid_by) REFERENCES users(id)
