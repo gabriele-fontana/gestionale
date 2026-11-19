@@ -4,7 +4,7 @@ const pool = require('../config/db');
 async function listUsers(req, res) {
     try {
         const [rows] = await pool.query(
-            'SELECT id, name, email, role, created_at FROM users WHERE apartment_id = ? ORDER BY name',
+            'SELECT id, name, email, role, is_active, created_at FROM users WHERE apartment_id = ? ORDER BY name',
             [req.user.apartmentId]
         );
         res.json(rows);

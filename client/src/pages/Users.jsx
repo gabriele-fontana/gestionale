@@ -35,7 +35,7 @@ export default function Users() {
         setSubmitting(true);
         try {
             const { data } = await api.post('/users', form);
-            setUsers((prev) => [...prev, data].sort(byName));
+            setUsers((prev) => [...prev, { ...data, is_active: true }].sort(byName));
             setForm({ name: '', email: '', password: '' });
             setShowForm(false);
         } catch (err) {
@@ -68,7 +68,18 @@ export default function Users() {
             setError(err.response?.data?.error || 'Errore del server');
         }
     }
-
+    async function handleToggleActive(target) {
+        const isActive = !target.is_active;
+        setError('');
+        try {
+            await api.patch(`/users/${target.id}`, { isActive });
+            setUsers((prev) =>
+                prev.map((u) => (u.id === target.id ? { ...u, is_active: isActive } : u))
+            );
+        } catch (err) {
+            setError(err.response?.data?.error || 'Errore del server');
+        }
+    }
     return (
         <section>
             <h1>Coinquilini</h1>
@@ -78,22 +89,30 @@ export default function Users() {
 
             <ul className="card-list">
                 {users.map((u) => (
-                    <li key={u.id} className="card">
+                    <li key={u.id} className={`card ${u.is_active ? '' : 'inactive'}`}>
                         <div className="info">
                             <strong>
                                 {u.name}
                                 {u.id === me.id && ' (tu)'}
                             </strong>
                             <span className="muted">{u.email}</span>
-                            <span className={`badge ${u.role}`}>
-                                {u.role === 'admin' ? 'Amministratore' : 'Utente'}
-                            </span>
+                            <div className="badges">
+                                <span className={`badge ${u.role}`}>
+                                    {u.role === 'admin' ? 'Amministratore' : 'Utente'}
+                                </span>
+                                {!u.is_active && <span className="badge off">Disattivato</span>}
+                            </div>
                         </div>
 
                         {isAdmin && u.id !== me.id && (
                             <div className="actions">
-                                <button className="secondary" onClick={() => handleToggleRole(u)}>
-                                    {u.role === 'admin' ? 'Rendi utente' : 'Rendi admin'}
+                                {u.is_active && (
+                                    <button className="secondary" onClick={() => handleToggleRole(u)}>
+                                        {u.role === 'admin' ? 'Rendi utente' : 'Rendi admin'}
+                                    </button>
+                                )}
+                                <button className="secondary" onClick={() => handleToggleActive(u)}>
+                                    {u.is_active ? 'Disattiva' : 'Riattiva'}
                                 </button>
                                 <button className="danger" onClick={() => handleDelete(u)}>
                                     Elimina
